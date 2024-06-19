@@ -6,7 +6,7 @@ let render_name = "ACCRETION";
 if (searchParams.has("name")) {
     render_name = searchParams.get("name")
 }
-let load = 0.0007;
+let load = 0.0010;
 if (searchParams.has("load")) {
     load = parseFloat(searchParams.get("load"))
 }
@@ -28,10 +28,10 @@ let x = []
 let y = []
 let vx = []
 let vy = []
-let slowdown = 0.95;
-let min = 0.00001;
+let slowdown = 0.97;
+let min = 0.0001;
 let initScale = 0.2;
-let sizeScale = 0.002;
+let sizeScale = 0.003;
 let cleanupTimeout = 5000;
 
 let stopped = [];
