@@ -6,7 +6,7 @@ let render_name = "ACCRETION";
 if (searchParams.has("name")) {
     render_name = searchParams.get("name")
 }
-let load = 0.0010;
+let load = 0.022;
 if (searchParams.has("load")) {
     load = parseFloat(searchParams.get("load"))
 }
@@ -28,10 +28,10 @@ let x = []
 let y = []
 let vx = []
 let vy = []
-let slowdown = 0.97;
+let slowdown = 0.99;
 let min = 0.0001;
-let initScale = 0.2;
-let sizeScale = 0.003;
+let initScale = 0.3;
+let sizeScale = 0.004;
 let cleanupTimeout = 5000;
 
 let stopped = [];
@@ -136,12 +136,16 @@ function update_all(elapsed) {
     }
 }
 
+function get_size() {
+    const min = Math.min(canvas.height, canvas.width)
+    return Math.max(Math.round(min * sizeScale), 2)
+}
+
 let draw_count = 0;
 function draw(ctx) {
     ctx.reset()
     ctx.fillStyle = "brown";
-    const min = Math.min(canvas.height, canvas.width)
-    let size = Math.max(Math.round(min * sizeScale), 2)
+    let size = get_size();
     for (let i = 0; i < x.length; i++) {
         draw_point(ctx, size, x[i], y[i]);
     }
@@ -182,14 +186,21 @@ function handle_resize() {
         // Resized.
         draw_name()
 
-        // Figure out how many particles to draw,
-        // by a load factor.
-        let count = Math.round(canvas.height * canvas.width * load)
+        // Adjust load factor by size of particle
+        let size = get_size();
+        // How many particles could fit on the screen,
+        // at the current size?
+        // Size divided by the area of a particle.
+        let maximumParticles = (canvas.height * canvas.width) / (Math.PI * size * size);
+        // Load to a fraction of that:
+        let count = Math.round(maximumParticles * load);
+
+        // Shrink to that many.
         if (stopped.length > count) {
             stopped.length = count;
         }
         count -= stopped.length;
-        while (x.length > count) {
+        while (count > 0 && x.length > count) {
             x.length = count
             y.length = count
             vx.length = count
